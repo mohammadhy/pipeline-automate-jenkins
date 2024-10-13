@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    environment {
+      REGISTERY='{{ REGISTERY_NAME }}'
+      IMAGE= '{{  PROJECT_NAME }}'
+    }
+    {% if EXIST_TOOLS %}
+    tools {
+      gradle '{{ GRADEL }}'
+    }
+    {% endif %}
+    stages {
+        stage('checkout') {
+            steps {
+              git branch: '{{ GIT_BRANCH }}', credentialsID: '{{ GIT_KEY }}', url: '{{ GIT_URL }}' '
+                }
+            }
+        stage('Get Short SHA'){
+          steps {
+            script {
+              env.CI_COMMIT_SHORT_SHA=sh(
+                script:'git rev-parse --short HEAD',
+                returnStdout: true).trim()
+            }
+          }
+        }
+        {% if CHECK_SECURITY %}
+        stage('check security') {
+          parallel {
+            {% if GIT_SECRET %}
+            stage('git secret'){
+              steps {
+                sh ''' docker run --platform linux/amd64 --rm -i -v "$PWD:/repo" {{ GIT_SECRET_IMAGE }} git --json --since-commit HEAD --only-verified --fail file:///repo > {{ GIT_SECRET_OUT_FILE }}'''
+              }
+             {% endif %}
+            }
+            {% if GIT_LEAKS %}
+            stage('git leaks'){
+              steps {
+                sh ''' docker run -v "$PWD:/repo" {{ GITLEAKS_IMAGE }} detect --source="/repo" --report-format="{{ GITLEAKS_FORMAT }}" --report-path="/repo/{{ GITLEAKS_OUT_FILE }}" -v '''
+              }
+            }
+            {% endif %} 
+          }
+        }
+        {% endif %}
+    }
+}
