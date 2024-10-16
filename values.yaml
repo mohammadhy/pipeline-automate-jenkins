@@ -6,7 +6,6 @@ ENGAGEMENT_ID: "2"
 PRODUCT_NAME: "milad-255"
 
 
-
 EXIST_TOOLS: true
 GRADEL: "gradel"
 
@@ -30,4 +29,21 @@ GITLEAKS_OUT_FILE: "gitleaks.json"
 SONAR_JAVA: true
 SONAR_PYTHON: false
 
-DEPLOY: true
+DEPLOY: false
+
+### ZAP Basic Configuration
+ZAP_URL: "http://192.168.42.14"
+ZAP_PORT: "8080"
+ZAP_API: "fkeaip9dqcg9229tpm9834vsod"
+ZAP_CONTEXT: "Default Context"
+ZAP_TARGET_USER_NAME: "None"
+ZAP_TARGET_URL: "http://192.168.42.232"
+ZAP_REPORT_FILENAME: "api-gateway.xml"
+## If You Need Zap Spider With Username Only Change This
+ZAP_SPIDER_USERNAME: false
+## If You Need Zap Spider Without Username Only Change This
+ZAP_SPIDER_WITHOUT_USERNAME: true
+## If You Need Zap Active Scan  With Username Only Change This
+ZAP_ACTIVE_SCAN_USERNAME: false
+## If You Need Zap Active Scan Without Username Only Change This
+ZAP_ACTIVE_SCAN_WITHOUT_USERNAME: true
