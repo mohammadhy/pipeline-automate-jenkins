@@ -1,44 +1,45 @@
-REGISTERY_NAME: "192.168.42.3:5000"
+REGISTERY_NAME: "192.168.1.104:5000"
 PROJECT_NAME: "${env.JOB_NAME}"
-PRODUCT_ID: "1"
-DOJO_URL: "192.168.42.12:8080"
+PRODUCT_ID: "2"
+DOJO_URL: "192.168.1.104:8080"
 ENGAGEMENT_ID: "2"
-PRODUCT_NAME: "milad-255"
+PRODUCT_NAME: "Python"
 
-
-EXIST_TOOLS: true
+### Configuration For tool
+EXIST_TOOLS: false
 GRADEL: "gradel"
 
-
-GIT_BRANCH: "develop"
+#### Configuration For Git
+GIT_BRANCH: "main"
 GIT_KEY: "26e885c2-5e8a-44c9-8eff-95fb21ad957b"
-GIT_URL: "http://192.168.42.2:8929/255-Backend/api-gateway.git"
+GIT_URL: "https://192.168.1.104:3000/hasan/python.git"
 
+### Configuration For Security Parallel
 CHECK_SECURITY: true
-
+## Git Secret
 GIT_SECRET: true
-GIT_SECRET_IMAGE: "192.168.42.3:5000/trufflehog:latest"
+GIT_SECRET_IMAGE: "192.168.1.104:5000/trufflehog"
 GIT_SECRET_OUT_FILE: "trufflehog.json"
-
-
+## Git Leaks
 GIT_LEAKS: true
-GITLEAKS_IMAGE: "192.168.42.3:5000/gitleaks"
+GITLEAKS_IMAGE: "192.168.1.104:5000/gitleaks"
 GITLEAKS_FORMAT: "json"
 GITLEAKS_OUT_FILE: "gitleaks.json"
+## Sonar 
+SONAR_JAVA: false
+SONAR_PYTHON: true
 
-SONAR_JAVA: true
-SONAR_PYTHON: false
-
+## Deployment
 DEPLOY: false
 
 ### ZAP Basic Configuration
-ZAP_URL: "http://192.168.42.14"
+ZAP_URL: "http://192.168.1.109"
 ZAP_PORT: "8080"
 ZAP_API: "fkeaip9dqcg9229tpm9834vsod"
 ZAP_CONTEXT: "Default Context"
 ZAP_TARGET_USER_NAME: "None"
 ZAP_TARGET_URL: "http://192.168.42.232"
-ZAP_REPORT_FILENAME: "api-gateway.xml"
+ZAP_REPORT_FILENAME: "python.xml"
 ## If You Need Zap Spider With Username Only Change This
 ZAP_SPIDER_USERNAME: false
 ## If You Need Zap Spider Without Username Only Change This

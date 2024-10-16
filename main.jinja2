@@ -67,7 +67,7 @@ pipeline {
                         SCAN_TYPE="Gitleaks Scan"
                         FILE_PATH="gitleaks.json"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" 192.168.42.12:8080/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -83,7 +83,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
@@ -100,7 +100,7 @@ pipeline {
                         SCAN_TYPE="Trufflehog Scan"
                         FILE_PATH="trufflehog.json"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" 192.168.42.12:8080/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -116,7 +116,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
@@ -156,7 +156,7 @@ pipeline {
                         SCAN_TYPE="Dependency Check Scan"
                         FILE_PATH="dependency-check-report.xml"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" 192.168.42.12:8080/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -172,7 +172,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
@@ -201,7 +201,7 @@ pipeline {
                         SCAN_TYPE="Trivy Scan"
                         FILE_PATH="trivy.json"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" 192.168.42.12:8080/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -217,7 +217,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"

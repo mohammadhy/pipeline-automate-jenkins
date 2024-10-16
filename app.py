@@ -34,7 +34,7 @@ job_config = f'''<?xml version='1.0' encoding='UTF-8'?>
 </flow-definition>
 '''
 #----------------- Code -----------------------
-server = jenkins.Jenkins('http://192.168.42.3:8080', username='milad', password='11512de8485bb0e4b3c37b1c0d329c9cb9')
+server = jenkins.Jenkins('http://192.168.1.110:30808', username='admin', password='asus1650')
 
 #jobs = server.get_all_jobs()
 #print(jobs)
