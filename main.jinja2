@@ -7,6 +7,8 @@ pipeline {
       DOJO_URL = '{{ DOJO_URL }}'
       ENGAGEMENT_ID = '{{ ENGAGEMENT_ID }}'
       PRODUCT_NAME = '{{ PRODUCT_NAME }}'
+      psswd = credentials('psswd')
+      Sonar_Token = credentials('Sonar')
     }
 
     {% if EXIST_TOOLS %}
@@ -224,6 +226,11 @@ pipeline {
                         fi
                     '''
                 }
+            }
+        }
+        stage('Login Registries') {
+            steps {
+              sh ''' docker login -u {{ REGISTRY_USERNAME }} -p $psswd 192.168.1.104:5000  '''
             }
         }
         stage('Push To Docker Registries') {
