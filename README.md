@@ -12,3 +12,5 @@
     ```bash
     pip install python-jenkins
     ```
+## usage
+1. on app.py import your jenkins-url and username&password 
