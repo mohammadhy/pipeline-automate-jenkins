@@ -38,3 +38,4 @@ Prepare DevSecops Pipeline That Analyze Your Code By SonarQube, Check Your Depen
 -  We Use SonarQube And Trivy, Grype To Scan Our Image And Code
 -  Send Our Report To Defectdojo
 -  If You Do Not Need To Have Any Of Theme  On The Values File Change That Part To False
+-  Nessus Is Not OpenSource You can Use FreeTrial
