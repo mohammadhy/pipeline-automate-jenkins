@@ -13,6 +13,7 @@
     pip install python-jenkins
     ```
 ## usage
-''' bash
-server = jenkins.Jenkins('http://192.168.1.110:30808', username='admin', password='asus1650')
-'''
+1. Import Your Jenkins-server 
+    ```bash
+    server = jenkins.Jenkins('<YOUR-URL>', username='<YOUR-USERNAME>', password='<YOUR-PASSWORD>')
+    ```
