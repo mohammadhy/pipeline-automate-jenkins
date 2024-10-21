@@ -4,17 +4,20 @@
 - [Requirements](#requirements)
 - [Usage](#usage)
 - [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
-## requirements
+## Requirements
 1. install library:
     ```bash
     pip install python-jenkins
     ```
-## usage
+## Usage
 1. Import Your Jenkins-server On app.py
     ```bash
     server = jenkins.Jenkins('<YOUR-URL>', username='<YOUR-USERNAME>', password='<YOUR-PASSWORD>')
     ```
 2. Import Your Values in values.yaml
+
+## Features
+- Feature1: You Have DevSecops Pipeline That Automate DAST Anaylsis Like Zap, Nessus
+- Feature2: We Use SonarQube And Trivy, Grype To Scan Our Image And Code
+- Feature3: Send Our Report To Defectdojo 
