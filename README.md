@@ -1,5 +1,6 @@
 # pipeline-automate-jenkins
 ## To Automate Create jenkinsfile And Create Job Use Library python-jenkins
+Prepare DevSecops Pipeline That Analyze Your Code By SonarQube, Check Your Dependency That Your Library Use it; Before Push To Registry Check vulnerabilities Image By Trivy And Grype; Also Send Our Reports To Defectdojo, At the End We Automate DAST To Test 
 ## Table of Contents
 - [Requirements](#requirements)
 - [Usage](#usage)
