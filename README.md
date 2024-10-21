@@ -17,3 +17,4 @@
     ```bash
     server = jenkins.Jenkins('<YOUR-URL>', username='<YOUR-USERNAME>', password='<YOUR-PASSWORD>')
     ```
+2. Import Your Values in values.yaml
