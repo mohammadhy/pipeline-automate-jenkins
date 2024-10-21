@@ -18,6 +18,6 @@
 2. Import Your Values in values.yaml
 
 ## Features
-- Feature1: You Have DevSecops Pipeline That Automate DAST Anaylsis Like Zap, Nessus
-- Feature2: We Use SonarQube And Trivy, Grype To Scan Our Image And Code
-- Feature3: Send Our Report To Defectdojo 
+-  You Have DevSecops Pipeline That Automate DAST Anaylsis Like Zap, Nessus
+-  We Use SonarQube And Trivy, Grype To Scan Our Image And Code
+-  Send Our Report To Defectdojo 
