@@ -13,6 +13,19 @@ Prepare DevSecops Pipeline That Analyze Your Code By SonarQube, Check Your Depen
     ```bash
     pip install python-jenkins
     ```
+2. Install DefectDojo:
+    ```bash
+    https://github.com/DefectDojo/django-DefectDojo
+    ```
+3. Install Zap:
+    ```bash
+    https://www.zaproxy.org/download/
+    ```
+4. Install zap-cli:
+    ```bash
+    pip install zapcli
+    export "PATH=$PATH:/home/<username>/.local/bin"
+    ```
 ## Usage
 1. Import Your Jenkins-server On app.py
     ```bash
