@@ -28,17 +28,20 @@ GITLEAKS_OUT_FILE: "gitleaks.json"
 ## Sonar 
 SONAR_JAVA: false
 SONAR_PYTHON: true
-
+SONAR_URL: "http://192.168.1.104:9100"
 ## Deployment
 DEPLOY: false
-
+### Nessus Basic Configuration
+NESSUS_SCAN: true
+NESSUS_URL: "https://192.168.1.104:8834"
+NESSUS_USER: "nessus"
+NESSUS_POLICY: "default"
 ### ZAP Basic Configuration
 ZAP_URL: "http://192.168.1.109"
 ZAP_PORT: "8080"
-ZAP_API: "fkeaip9dqcg9229tpm9834vsod"
+ZAP_API: "asadasd544444dsf"
 ZAP_CONTEXT: "Default Context"
 ZAP_TARGET_USER_NAME: "None"
-ZAP_TARGET_URL: "http://192.168.42.232"
 ZAP_REPORT_FILENAME: "python.xml"
 ## If You Need Zap Spider With Username Only Change This
 ZAP_SPIDER_USERNAME: false
