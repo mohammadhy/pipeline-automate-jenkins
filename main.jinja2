@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
       REGISTERY ='{{ REGISTERY_NAME }}'
-      IMAGE = "{{  PROJECT_NAME }}"
+      IMAGE = "{{ PROJECT_NAME }}"
       PRODUCT_ID = '{{ PRODUCT_ID }}'
       DOJO_URL = '{{ DOJO_URL }}'
       ENGAGEMENT_ID = '{{ ENGAGEMENT_ID }}'
@@ -47,18 +47,8 @@ pipeline {
             }
             {% endif %} 
           }
-        {% endif %}
+        
         }
-        {% if SONAR_JAVA %}
-        stage('Sonarqube'){ 
-            steps{ 
-                withSonarQubeEnv('Sonar-Server-8.9.2'){ 
-                    sh ''' gradle build '''
-                    sh ''' gradle sonar ''' 
-                }
-            }
-        }
-        {% endif %}
         stage('Upload Scan Gitleaks') {
             steps {
                 script {
@@ -67,7 +57,7 @@ pipeline {
                         SCAN_TYPE="Gitleaks Scan"
                         FILE_PATH="gitleaks.json"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token $API_KEY" $DOJO_URL/api/v2/tests/?engagement=$ENGAGEMENT_ID | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -83,7 +73,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
@@ -100,7 +90,7 @@ pipeline {
                         SCAN_TYPE="Trufflehog Scan"
                         FILE_PATH="trufflehog.json"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token $API_KEY" $DOJO_URL/api/v2/tests/?engagement=$ENGAGEMENT_ID | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -116,7 +106,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
@@ -125,12 +115,22 @@ pipeline {
                 }
             }
         }
-        {% if SONAR_PYTHON %}
+        {% endif %}
+
+        {% if SONAR_JAVA %}
         stage('Sonarqube'){ 
             steps{ 
                 withSonarQubeEnv('Sonar-Server-8.9.2'){ 
-                    sh ''' /var/lib/jenkins/sonar-cli/bin/sonar-scanner -Dsonar.projectKey=$IMAGE -Dsonar.sources=.  -Dsonar.exclusions=dependency-check-*''' 
+                    sh ''' gradle build '''
+                    sh ''' gradle sonar ''' 
                 }
+            }
+        }
+        {% endif %}
+        {% if SONAR_PYTHON %}
+        stage('Sonarqube'){ 
+            steps{  
+              sh ''' docker run --rm -e SONAR_HOST_URL="$SONAR_URL" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=${IMAGE} -Dsonar.login=${Sonar_Token}" -v $PWD:/usr/src $REGISTERY/sonar-scanner-cli '''
             }
         }
         {% endif %}
@@ -156,7 +156,7 @@ pipeline {
                         SCAN_TYPE="Dependency Check Scan"
                         FILE_PATH="dependency-check-report.xml"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token $API_KEY" $DOJO_URL/api/v2/tests/?engagement=$ENGAGEMENT_ID | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -172,7 +172,7 @@ pipeline {
                         check_existing_test_by_type
                         if [ $? -eq 1 ];then
                             echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
+                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "http://192.168.42.12:8080/api/v2/reimport-scan/"
                         else
                             echo "Starting Import"
                             curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
@@ -201,102 +201,7 @@ pipeline {
                         SCAN_TYPE="Trivy Scan"
                         FILE_PATH="trivy.json"
                        
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" $DOJO_URL/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
-                        echo "$IN"
-                        check_existing_test_by_type() {
-                            while [ "$IN" != "$iter" ] ;do
-                                iter=${IN%%,*}
-                                IN="${IN#$iter,}"
-                                echo "$iter"
-                                if [ "$iter" = "$SCAN_TYPE" ]; then
-                                    return 1
-                                fi
-                            done
-                            return 0
-                        }
-                        check_existing_test_by_type
-                        if [ $? -eq 1 ];then
-                            echo "Starting Reimport"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "product_name=$PRODUCT_NAME"  -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "engagement_name=$IMAGE" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH"  "$DOJO_URL/api/v2/reimport-scan/"
-                        else
-                            echo "Starting Import"
-                            curl -X POST --header "Content-Type: multipart/form-data" --header "Authorization: Token $API_KEY" -F "product_id=$PRODUCT_ID" -F "engagement=$ENGAGEMENT_ID" -F "active=true" -F "product_name=$PRODUCT_NAME" -F "scan_type=$SCAN_TYPE" -F "file=@$FILE_PATH" "$DOJO_URL/api/v2/import-scan/"
-                        fi
-                    '''
-                }
-            }
-        }
-        stage('Push To Docker Registries') {
-            steps {
-              sh ''' docker push $REGISTERY/$IMAGE:v1 '''
-              sh ''' docker push $REGISTERY/$IMAGE:$CI_COMMIT_SHORT_SHA '''
-            }
-        }
-        {% if DEPLOY %}
-        stage('Deploy') {
-            steps {
-               sh ''' kubectl -n develop --context devuser-context set image deployment/$IMAGE $IMAGE=$REGISTERY/$IMAGE:$CI_COMMIT_SHORT_SHA  '''
-            }
-        }
-        {% endif %}
-        
-        stage('Dast Zap Analaysis') {
-          parallel {
-              
-            stage('Zap Import Context'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} context import "{{ ZAP_CONTEXT }}" '''
-              }
-            }
-            stage('Zap Open-url'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} open-url {{ ZAP_TARGET_URL }} '''
-              }
-            }
-            {% if ZAP_SPIDER_USERNAME %}
-            stage('Zap Spider Scan With Username'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} spider -c {{ ZAP_CONTEXT }} -u {{ ZAP_TARGET_USER_NAME }} {{ ZAP_TARGET_URL }} '''
-              }
-            }
-            {% endif %}
-            {% if ZAP_SPIDER_WITHOUT_USERNAME %}
-            stage('Zap Spider Scan Without Username'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} spider -c "{{ ZAP_CONTEXT }}"  {{ ZAP_TARGET_URL }} '''
-              }
-            }
-            {% endif %}
-            {% if ZAP_ACTIVE_SCAN_USERNAME %}          
-            stage('Zap Active Scan With Username'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} active-scan --recursive -c {{ ZAP_CONTEXT }} -u {{ ZAP_TARGET_USER_NAME }} {{ ZAP_TARGET_URL }} '''
-              }
-            }
-            {% endif %}
-            {% if ZAP_ACTIVE_SCAN_WITHOUT_USERNAME %}
-            stage('Zap Active Scan Without Username'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} active-scan --recursive -c "{{ ZAP_CONTEXT }}"  {{ ZAP_TARGET_URL }} '''
-              }
-            }
-            {% endif %}
-            stage('Zap Publish Report'){
-              steps {
-                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }}  report -f xml -o {{ ZAP_REPORT_FILENAME }} '''
-              }
-            }
-          }
-        }
-        stage('Upload Zap Report') {
-            steps {
-                script {
-                    sh '''#!/bin/bash
-                        API_KEY="6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab"
-                        SCAN_TYPE="ZAP Scan"
-                        FILE_PATH="{{ ZAP_REPORT_FILENAME }}"
-                       
-                        IN=$(curl -X GET --header "Authorization: Token 6241eeb3e9f7ff818a4a6e976dedaa261dfae5ab" 192.168.42.12:8080/api/v2/tests/?engagement=2 | jq -r '[.results[].scan_type] | join(",")')
+                        IN=$(curl -X GET --header "Authorization: Token $API_KEY" $DOJO_URL/api/v2/tests/?engagement=$ENGAGEMENT_ID | jq -r '[.results[].scan_type] | join(",")')
                         echo "$IN"
                         check_existing_test_by_type() {
                             while [ "$IN" != "$iter" ] ;do
@@ -320,6 +225,86 @@ pipeline {
                     '''
                 }
             }
-        }                      
+        }
+        stage('Push To Docker Registries') {
+            steps {
+              sh ''' docker push $REGISTERY/$IMAGE:v1 '''
+              sh ''' docker push $REGISTERY/$IMAGE:$CI_COMMIT_SHORT_SHA '''
+            }
+        }
+        {% if DEPLOY %}
+        stage('Deploy') {
+            steps {
+               sh ''' kubectl -n develop --context devuser-context set image deployment/$IMAGE $IMAGE=$REGISTERY/$IMAGE:$CI_COMMIT_SHORT_SHA  '''
+            }
+        }
+        {% endif %}
+
+        stage('Extract Ip'){
+          steps {
+            script {
+              env.TARGET_URL=sh(
+                script:'kubectl get svc $IMAGE -n develop -o json | jq -r ".status[].ingress[0].ip"',returnStdout: true)
+            }
+          }
+        }
+        {% if NESSUS_SCAN %}
+        stage('Nessus-Scan') {
+            steps {
+               sh '''/var/lib/jenkins/.local/bin/py-nessus-pro launch-scan -s {{ NESSUS_URL }} -u {{ NESSUS_USER }} -n $IMAGE -t http://$TARGET_URL -f {{ PRODUCT_NAME }}  -p {{ NESSUS_POLICY }}  '''
+            }
+        }
+        {% endif %}
+        
+        {% if ZAP_SCAN %}
+        stage('Dast Zap Analaysis') {
+          parallel {
+              
+            stage('Zap Import Context'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} context import "{{ ZAP_CONTEXT }}" '''
+              }
+            }
+            stage('Zap Open-url'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} open-url http://$TARGET_URL '''
+              }
+            }
+            {% if ZAP_SPIDER_USERNAME %}
+            stage('Zap Spider Scan With Username'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} spider -c {{ ZAP_CONTEXT }} -u {{ ZAP_TARGET_USER_NAME }} http://$TARGET_URL '''
+              }
+            }
+            {% endif %}
+            {% if ZAP_SPIDER_WITHOUT_USERNAME %}
+            stage('Zap Spider Scan Without Username'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} spider -c "{{ ZAP_CONTEXT }}" http://$TARGET_URL '''
+              }
+            }
+            {% endif %}
+            {% if ZAP_ACTIVE_SCAN_USERNAME %}          
+            stage('Zap Active Scan With Username'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} active-scan --recursive -c {{ ZAP_CONTEXT }} -u {{ ZAP_TARGET_USER_NAME }} http://$TARGET_URL '''
+              }
+            }
+            {% endif %}
+            {% if ZAP_ACTIVE_SCAN_WITHOUT_USERNAME %}
+            stage('Zap Active Scan Without Username'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }} active-scan --recursive -c "{{ ZAP_CONTEXT }}" http://$TARGET_URL '''
+              }
+            }
+            {% endif %}
+            stage('Zap Publish Report'){
+              steps {
+                sh ''' zap-cli --zap-url {{ ZAP_URL }} --port {{ ZAP_PORT }} --api-key {{ ZAP_API }}  report -f xml -o {{ ZAP_REPORT_FILENAME }} '''
+              }
+            }
+          }
+        }
+        {% endif %}                      
     }
 }
